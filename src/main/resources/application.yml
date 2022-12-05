@@ -1,0 +1,11 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:4000/test
+    driver-class-name: org.postgresql.Driver
+    username: user
+    password: pass
+
+server:
+  port: 3001
+  servlet:
+    context-path: /v1/core-api
