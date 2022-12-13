@@ -14,29 +14,17 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class WebSecurityConfig {
 
     private final CustomUserDetailService customUserDetailService;
-    private final AuthService authService;
 
-    public WebSecurityConfig(CustomUserDetailService customUserDetailService, AuthService authService) {
+    public WebSecurityConfig(CustomUserDetailService customUserDetailService) {
         this.customUserDetailService = customUserDetailService;
-        this.authService = authService;
     }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf().disable()
-                .addFilterAfter(new JWTAuthorizationFilter(authService.getKey()),
-                        UsernamePasswordAuthenticationFilter.class)
-                .authorizeHttpRequests()
-                .requestMatchers(HttpMethod.POST, "/auth")
-                .permitAll()
-                .and()
-                .authorizeHttpRequests()
-                .requestMatchers(HttpMethod.POST, "/person/create")
-                .permitAll()
-                .and()
                 .authorizeHttpRequests()
                 .anyRequest()
-                .hasAuthority("ADMIN");
+                .permitAll();
 
         return http.build();
     }

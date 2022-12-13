@@ -15,14 +15,14 @@ public class AuthController {
         this.authService = authService;
     }
 
-    @GetMapping
+    @GetMapping("/test")
     public @ResponseBody ResponseEntity<Boolean> validateToken(@RequestBody String token) {
         Boolean result = authService.validateToken(token);
 
         return ResponseEntity.ok().body(result);
     }
 
-    @PostMapping
+    @PostMapping("/login")
     public @ResponseBody ResponseEntity<String> requestToken(@RequestBody LoginDTO loginDTO) {
         String result = authService.createToken(loginDTO);
 

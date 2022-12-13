@@ -1,13 +1,16 @@
 package com.licenta.core.services;
 
 import com.licenta.core.exceptionHandlers.authExceptios.FailedAuth;
+import com.licenta.core.models.ChangePasswordDTO;
 import com.licenta.core.models.LoginDTO;
 import com.licenta.core.models.Person;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.stereotype.Service;
@@ -20,9 +23,17 @@ import java.util.List;
 @Service
 public class AuthService {
 
+    @Value("${jwt.secret}")
+    private String secret;
+
     private final PersonService personService;
 
-    Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+    Key key;
+
+    @PostConstruct
+    public void init() {
+        this.key = Keys.hmacShaKeyFor(secret.getBytes());
+    }
 
     public AuthService(PersonService personService) {
         this.personService = personService;
@@ -44,6 +55,7 @@ public class AuthService {
                     .claim("authorities",
                             grantedAuthorities.stream()
                                     .map(GrantedAuthority::getAuthority).toList())
+                    .claim("emailAddress", loginDTO.getEmailAddress())
                     .signWith(key)
                     .compact();
         } else {
@@ -62,9 +74,5 @@ public class AuthService {
         }
 
         return false;
-    }
-
-    public Key getKey() {
-        return key;
     }
 }

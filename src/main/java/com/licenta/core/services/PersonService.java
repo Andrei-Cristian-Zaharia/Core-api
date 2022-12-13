@@ -4,7 +4,10 @@ import com.google.common.hash.Hashing;
 import com.licenta.core.enums.AccountType;
 import com.licenta.core.enums.ObjectType;
 import com.licenta.core.exceptionHandlers.NotFoundException;
+import com.licenta.core.exceptionHandlers.authExceptios.FailedAuth;
 import com.licenta.core.exceptionHandlers.authExceptios.PersonAlreadyExists;
+import com.licenta.core.models.ChangePasswordDTO;
+import com.licenta.core.models.DeleteFormDTO;
 import com.licenta.core.models.Person;
 import com.licenta.core.models.createRequestDTO.CreatePersonDTO;
 import com.licenta.core.models.responseDTO.PersoneResponseDTO;
@@ -53,6 +56,12 @@ public class PersonService {
         return person.orElseThrow(() -> new NotFoundException(ObjectType.PERSON, name));
     }
 
+    public Person getPersonById(Long id) {
+        Optional<Person> person = personRepository.findById(id);
+
+        return person.orElseThrow(() -> new NotFoundException(ObjectType.PERSON, id));
+    }
+
     public Person getPersonByEmailAddressString(String emailAddress) {
         Optional<Person> person = personRepository.findByEmailAddress(emailAddress);
 
@@ -66,5 +75,51 @@ public class PersonService {
                         sha256().
                         hashString(password, StandardCharsets.UTF_8).toString()
         );
+    }
+
+    public void resetPassword(ChangePasswordDTO changePasswordDTO) {
+
+        if (Boolean.FALSE.equals(
+                validatePersonAccount(changePasswordDTO.getEmailAddress(), changePasswordDTO.getOldPassword()))) {
+            return;
+        }
+
+        Person person = getPersonByEmailAddressString(changePasswordDTO.getEmailAddress());
+        person.setPassword(
+                Hashing.
+                        sha256().
+                        hashString(changePasswordDTO.getNewPassword(), StandardCharsets.UTF_8).toString()
+        );
+
+        personRepository.save(person);
+    }
+
+    public void deleteSelfPerson(DeleteFormDTO deleteFormDTO) {
+
+        if (Boolean.FALSE.equals(
+                validatePersonAccount(deleteFormDTO.getEmailAddress(), deleteFormDTO.getPassword()))) {
+            return;
+        }
+
+        Person person = getPersonByEmailAddressString(deleteFormDTO.getEmailAddress());
+        personRepository.delete(person);
+    }
+
+    public Boolean updatePersonStatus(String status) {
+
+        return true;
+    }
+
+    public void deleteById(Long id) {
+        personRepository.deleteById(id);
+    }
+
+    public Boolean validatePersonAccount(String email, String password) {
+
+        if (Boolean.TRUE.equals(findExistingAccount(email, password))) {
+            return true;
+        } else {
+            throw new FailedAuth();
+        }
     }
 }
