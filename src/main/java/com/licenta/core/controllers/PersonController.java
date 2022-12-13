@@ -1,9 +1,6 @@
 package com.licenta.core.controllers;
 
-import com.licenta.core.models.ChangePasswordDTO;
-import com.licenta.core.models.ConfirmAccountDTO;
-import com.licenta.core.models.DeleteFormDTO;
-import com.licenta.core.models.Person;
+import com.licenta.core.models.*;
 import com.licenta.core.models.createRequestDTO.CreatePersonDTO;
 import com.licenta.core.models.responseDTO.PersoneResponseDTO;
 import com.licenta.core.services.PersonService;
@@ -67,7 +64,7 @@ public class PersonController {
     }
 
     @PostMapping("/validate")
-    public @ResponseBody ResponseEntity<Boolean> validateAccount(@RequestBody ConfirmAccountDTO confirmAccountDTO) {
+    public @ResponseBody ResponseEntity<Long> validateAccount(@RequestBody ConfirmAccountDTO confirmAccountDTO) {
 
         return ResponseEntity.ok().body(
                 personService.validatePersonAccount(
@@ -76,14 +73,9 @@ public class PersonController {
         );
     }
 
-    @PostMapping("/updatePerson")
-    public @ResponseBody ResponseEntity<Boolean> updatePersonStatus(@RequestBody ConfirmAccountDTO confirmAccountDTO) {
-
-        return ResponseEntity.ok().body(
-                personService.validatePersonAccount(
-                        confirmAccountDTO.getEmailAddress(),
-                        confirmAccountDTO.getPassword())
-        );
+    @PostMapping("/updateRestaurantStatus")
+    public void updatePersonHasRestaurantStatus(@RequestBody UpdatePersonHasRestaurantStatusDTO req) {
+        personService.updateRestaurantStatus(req);
     }
 
     @DeleteMapping("/delete")

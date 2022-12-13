@@ -17,3 +17,7 @@ core:
   user-paths:
     - "/person/reset"
     - "/person/deleteSelf"
+    - "/person/updateRestaurantStatus"
+    - "/person/id"
+    - "/person/name"
+    - "/person/validate"

@@ -22,6 +22,9 @@ public class Person {
     @Column(name = "email_address")
     private String emailAddress;
 
+    @Column(name = "has_restaurant")
+    private Boolean hasRestaurant;
+
     @Column(name = "account_type")
     private String accountType;
 }

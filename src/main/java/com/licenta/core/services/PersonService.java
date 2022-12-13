@@ -9,6 +9,7 @@ import com.licenta.core.exceptionHandlers.authExceptios.PersonAlreadyExists;
 import com.licenta.core.models.ChangePasswordDTO;
 import com.licenta.core.models.DeleteFormDTO;
 import com.licenta.core.models.Person;
+import com.licenta.core.models.UpdatePersonHasRestaurantStatusDTO;
 import com.licenta.core.models.createRequestDTO.CreatePersonDTO;
 import com.licenta.core.models.responseDTO.PersoneResponseDTO;
 import com.licenta.core.repositories.PersonRepository;
@@ -17,6 +18,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -40,6 +42,7 @@ public class PersonService {
         Person person = new Person();
         person.setUsername(createPersonDTO.getUsername());
         person.setEmailAddress(createPersonDTO.getEmailAddress());
+        person.setHasRestaurant(false);
         person.setAccountType(AccountType.REGULAR_USER.toString());
         person.setPassword(
                 Hashing.
@@ -69,20 +72,21 @@ public class PersonService {
     }
 
     public Boolean findExistingAccount(String emailAddress, String password) {
-        return personRepository.existsByEmailAddressAndPassword(
+        if (Objects.equals(Boolean.TRUE, personRepository.existsByEmailAddressAndPassword(
                 emailAddress,
                 Hashing.
                         sha256().
                         hashString(password, StandardCharsets.UTF_8).toString()
-        );
+        ))) {
+            return true;
+        }
+
+        throw new FailedAuth();
     }
 
     public void resetPassword(ChangePasswordDTO changePasswordDTO) {
 
-        if (Boolean.FALSE.equals(
-                validatePersonAccount(changePasswordDTO.getEmailAddress(), changePasswordDTO.getOldPassword()))) {
-            return;
-        }
+        validatePersonAccount(changePasswordDTO.getEmailAddress(), changePasswordDTO.getOldPassword());
 
         Person person = getPersonByEmailAddressString(changePasswordDTO.getEmailAddress());
         person.setPassword(
@@ -96,30 +100,31 @@ public class PersonService {
 
     public void deleteSelfPerson(DeleteFormDTO deleteFormDTO) {
 
-        if (Boolean.FALSE.equals(
-                validatePersonAccount(deleteFormDTO.getEmailAddress(), deleteFormDTO.getPassword()))) {
-            return;
-        }
+        validatePersonAccount(deleteFormDTO.getEmailAddress(), deleteFormDTO.getPassword());
 
         Person person = getPersonByEmailAddressString(deleteFormDTO.getEmailAddress());
         personRepository.delete(person);
     }
 
-    public Boolean updatePersonStatus(String status) {
+    public void updateRestaurantStatus(UpdatePersonHasRestaurantStatusDTO req) {
 
-        return true;
+        personRepository.findById(req.getId()).ifPresent((Person p) -> {
+            p.setHasRestaurant(req.getStatus());
+            personRepository.save(p);
+        });
     }
 
     public void deleteById(Long id) {
         personRepository.deleteById(id);
     }
 
-    public Boolean validatePersonAccount(String email, String password) {
+    public Long validatePersonAccount(String email, String password) {
 
         if (Boolean.TRUE.equals(findExistingAccount(email, password))) {
-            return true;
-        } else {
-            throw new FailedAuth();
+
+            return personRepository.findByEmailAddress(email).get().getId();
         }
+
+        return null;
     }
 }

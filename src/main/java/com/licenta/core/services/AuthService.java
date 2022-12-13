@@ -55,7 +55,7 @@ public class AuthService {
                     .claim("authorities",
                             grantedAuthorities.stream()
                                     .map(GrantedAuthority::getAuthority).toList())
-                    .claim("emailAddress", loginDTO.getEmailAddress())
+                    .claim("email", loginDTO.getEmailAddress())
                     .signWith(key)
                     .compact();
         } else {
