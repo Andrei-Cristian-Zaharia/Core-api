@@ -20,4 +20,5 @@ core:
     - "/person/updateRestaurantStatus"
     - "/person/id"
     - "/person/name"
+    - "/person/email"
     - "/person/validate"

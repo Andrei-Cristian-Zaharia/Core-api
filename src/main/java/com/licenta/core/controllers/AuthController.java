@@ -15,7 +15,7 @@ public class AuthController {
         this.authService = authService;
     }
 
-    @GetMapping("/test")
+    @PostMapping("/test")
     public @ResponseBody ResponseEntity<Boolean> validateToken(@RequestBody String token) {
         Boolean result = authService.validateToken(token);
 

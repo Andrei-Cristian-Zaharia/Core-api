@@ -45,8 +45,10 @@ public class RouteFilter implements Filter {
 
         if (("[REGULAR_USER]").equals(req.getHeader(AUTH_HEADER))) {
 
+            String path = cleanPath(req.getRequestURI());
+
             for (String route: coreConfigurations.getUserPaths()) {
-                if (req.getRequestURI().equals(URI_PREFIX + route)) {
+                if (path.equals(URI_PREFIX + route)) {
                     chain.doFilter(request, response);
                     return;
                 }
@@ -56,5 +58,13 @@ public class RouteFilter implements Filter {
         res.setStatus(401);
         res.getOutputStream()
                 .write(("Given authorities for request: " + req.getRequestURI() + " are not enough.").getBytes());
+    }
+
+    private String cleanPath(String oldPath) {
+        if (oldPath.contains("?")) {
+            return oldPath.substring(oldPath.indexOf("?"));
+        } else {
+            return oldPath;
+        }
     }
 }
