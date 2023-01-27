@@ -2,7 +2,7 @@ package com.licenta.core.controllers;
 
 import com.licenta.core.models.*;
 import com.licenta.core.models.createRequestDTO.CreatePersonDTO;
-import com.licenta.core.models.responseDTO.PersoneResponseDTO;
+import com.licenta.core.models.responseDTO.PersonResponseDTO;
 import com.licenta.core.services.PersonService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,9 +19,9 @@ public class PersonController {
     }
 
     @PostMapping("/create")
-    public @ResponseBody ResponseEntity<PersoneResponseDTO> createNewPerson(@RequestBody CreatePersonDTO createPersonDTO) {
+    public @ResponseBody ResponseEntity<PersonResponseDTO> createNewPerson(@RequestBody CreatePersonDTO createPersonDTO) {
 
-        PersoneResponseDTO person = personService.createNewPerson(createPersonDTO);
+        PersonResponseDTO person = personService.createNewPerson(createPersonDTO);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(person);
     }

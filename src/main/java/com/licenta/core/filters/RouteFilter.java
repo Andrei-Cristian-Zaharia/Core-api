@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Component;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.Enumeration;
 
@@ -31,7 +32,6 @@ public class RouteFilter implements Filter {
 
         String header = req.getHeader(AUTH_HEADER);
         Enumeration<String> headers = req.getHeaderNames();
-        String uri = req.getRequestURI().toString();
 
         if (("[ADMIN]").equals(req.getHeader(AUTH_HEADER))) {
             chain.doFilter(request, response);

@@ -11,7 +11,7 @@ import com.licenta.core.models.DeleteFormDTO;
 import com.licenta.core.models.Person;
 import com.licenta.core.models.UpdatePersonHasRestaurantStatusDTO;
 import com.licenta.core.models.createRequestDTO.CreatePersonDTO;
-import com.licenta.core.models.responseDTO.PersoneResponseDTO;
+import com.licenta.core.models.responseDTO.PersonResponseDTO;
 import com.licenta.core.repositories.PersonRepository;
 import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
@@ -33,7 +33,7 @@ public class PersonService {
     }
 
     @Transactional
-    public PersoneResponseDTO createNewPerson(CreatePersonDTO createPersonDTO) {
+    public PersonResponseDTO createNewPerson(CreatePersonDTO createPersonDTO) {
 
         if (personRepository.findByEmailAddress(createPersonDTO.getEmailAddress()).isPresent()) {
             throw new PersonAlreadyExists();
@@ -50,7 +50,7 @@ public class PersonService {
                         hashString(createPersonDTO.getPassword(), StandardCharsets.UTF_8).toString()
         );
 
-        return modelMapper.map(personRepository.save(person), PersoneResponseDTO.class);
+        return modelMapper.map(personRepository.save(person), PersonResponseDTO.class);
     }
 
     public Person getPersonByName(String name) {

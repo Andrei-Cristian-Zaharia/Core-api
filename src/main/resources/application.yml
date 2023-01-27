@@ -22,3 +22,4 @@ core:
     - "/person/name"
     - "/person/email"
     - "/person/validate"
+    - "/review/delete"

@@ -4,6 +4,7 @@ import com.licenta.core.exceptionHandlers.AlreadyExistsException;
 import com.licenta.core.exceptionHandlers.NotFoundException;
 import com.licenta.core.exceptionHandlers.authExceptios.FailedAuth;
 import com.licenta.core.exceptionHandlers.authExceptios.PersonAlreadyExists;
+import com.licenta.core.exceptionHandlers.reviewExceptions.ReviewDeleteForbidden;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -22,7 +23,7 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.CONFLICT);
     }
 
-    @ExceptionHandler(FailedAuth.class)
+    @ExceptionHandler({FailedAuth.class, ReviewDeleteForbidden.class})
     public ResponseEntity<Object> handleFailedAuth(RuntimeException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.FORBIDDEN);
     }
