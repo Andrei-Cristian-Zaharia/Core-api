@@ -6,12 +6,9 @@ import com.licenta.core.enums.ObjectType;
 import com.licenta.core.exceptionHandlers.NotFoundException;
 import com.licenta.core.exceptionHandlers.authExceptios.FailedAuth;
 import com.licenta.core.exceptionHandlers.authExceptios.PersonAlreadyExists;
-import com.licenta.core.models.ChangePasswordDTO;
-import com.licenta.core.models.DeleteFormDTO;
-import com.licenta.core.models.Person;
-import com.licenta.core.models.UpdatePersonHasRestaurantStatusDTO;
+import com.licenta.core.models.*;
 import com.licenta.core.models.createRequestDTO.CreatePersonDTO;
-import com.licenta.core.models.responseDTO.PersonResponseDTO;
+import com.licenta.core.models.responseDTO.*;
 import com.licenta.core.repositories.PersonRepository;
 import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
@@ -26,10 +23,16 @@ public class PersonService {
 
     private final ModelMapper modelMapper;
     private final PersonRepository personRepository;
+    private final RestaurantRestTemplateService restaurantRestTemplateService;
+    private final RecipeRestTemplateService recipeRestTemplateService;
 
-    public PersonService(ModelMapper modelMapper, PersonRepository personRepository) {
+    public PersonService(ModelMapper modelMapper, PersonRepository personRepository,
+                         RestaurantRestTemplateService restaurantRestTemplateService,
+                         RecipeRestTemplateService recipeRestTemplateService) {
         this.modelMapper = modelMapper;
         this.personRepository = personRepository;
+        this.restaurantRestTemplateService = restaurantRestTemplateService;
+        this.recipeRestTemplateService = recipeRestTemplateService;
     }
 
     @Transactional
@@ -53,10 +56,25 @@ public class PersonService {
         return modelMapper.map(personRepository.save(person), PersonResponseDTO.class);
     }
 
-    public Person getPersonByName(String name) {
+    public PersonResponseDTO getPersonByName(String name) {
         Optional<Person> person = personRepository.findByUsername(name);
 
-        return person.orElseThrow(() -> new NotFoundException(ObjectType.PERSON, name));
+        return modelMapper.map(
+                person.orElseThrow(() -> new NotFoundException(ObjectType.PERSON, name)),
+                PersonResponseDTO.class
+        );
+    }
+
+    public PersonDetailsResponseDTO getPersonDetails(String name) {
+        PersonDetailsResponseDTO person = modelMapper.map(getPersonByName(name), PersonDetailsResponseDTO.class);
+
+        person.setOwnedRecipes(
+                recipeRestTemplateService.getRecipeByOwnerUsername(person.getUsername()).stream()
+                        .map((Recipe r) -> modelMapper.map(r, ResponseRecipeDTO.class))
+                        .toList()
+        );
+
+        return person;
     }
 
     public Person getPersonById(Long id) {

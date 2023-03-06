@@ -1,9 +1,11 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:4000/test
+    url: jdbc:postgresql://localhost:5432/test
     driver-class-name: org.postgresql.Driver
     username: user
     password: pass
+  main:
+    allow-circular-references: true
 
 server:
   port: 3001
@@ -23,3 +25,4 @@ core:
     - "/person/email"
     - "/person/validate"
     - "/review/delete"
+    - "/review/create"

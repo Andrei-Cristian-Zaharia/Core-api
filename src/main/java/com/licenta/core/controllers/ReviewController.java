@@ -26,6 +26,18 @@ public class ReviewController {
         return ResponseEntity.status(HttpStatus.CREATED).body(reviewService.createReview(createReviewDTO));
     }
 
+    @GetMapping("/all/user")
+    public @ResponseBody ResponseEntity<List<ReviewResponseDTO>> getAllForUser(@RequestParam String email){
+        return ResponseEntity.ok().body(reviewService.getAllForUser(email));
+    }
+
+    @GetMapping("/check/entity/existence")
+    public @ResponseBody ResponseEntity<Boolean> checkReviewEntityExistence(@RequestParam String email,
+                                                                      @RequestParam Long entityId,
+                                                                      @RequestParam String category) {
+        return ResponseEntity.ok().body(reviewService.checkEntityReviewExistence(email, entityId, category));
+    }
+
     @PostMapping("/all/entity")
     public @ResponseBody ResponseEntity<List<ReviewResponseDTO>> getAllForEntity(@RequestBody RetrieveReviewDTO retrieveReviewDTO){
         return ResponseEntity.ok().body(reviewService.getAllReviewsForEntity(retrieveReviewDTO));

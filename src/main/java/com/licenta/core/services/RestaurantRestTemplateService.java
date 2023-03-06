@@ -34,6 +34,17 @@ public class RestaurantRestTemplateService {
         return restTemplate.exchange(uri, HttpMethod.GET, entityCredentials, Restaurant.class).getBody();
     }
 
+    public Restaurant getRestaurantByOwnerId(String username) {
+        URI uri = ApiConfig.restaurantApiPath()
+                .path(RESTAURANT_ROUTE)
+                .path("owner/{username}")
+                .build(username);
+
+        HttpEntity<String> entityCredentials = new HttpEntity<>(null, createHeaderBody());
+
+        return restTemplate.exchange(uri, HttpMethod.GET, entityCredentials, Restaurant.class).getBody();
+    }
+
     private static HttpHeaders createHeaderBody() {
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);

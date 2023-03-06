@@ -2,21 +2,24 @@ package com.licenta.core.services;
 
 import com.licenta.core.enums.ReviewCategory;
 import com.licenta.core.exceptionHandlers.reviewExceptions.ReviewDeleteForbidden;
+import com.licenta.core.exceptionHandlers.reviewExceptions.ReviewPostLimit;
 import com.licenta.core.models.*;
 import com.licenta.core.models.createRequestDTO.CreateReviewDTO;
 import com.licenta.core.models.responseDTO.PersonResponseDTO;
+import com.licenta.core.models.responseDTO.PersonReviewResponseDTO;
 import com.licenta.core.models.responseDTO.ReviewResponseDTO;
 import com.licenta.core.repositories.ReviewRepository;
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+@Slf4j
 @Service
 public class ReviewService {
 
@@ -38,7 +41,7 @@ public class ReviewService {
 
     public List<ReviewResponseDTO> getAllReviewsForEntity(RetrieveReviewDTO retrieveReviewDTO) {
 
-        return reviewRepository.getReviewsByCategory(retrieveReviewDTO.getCategory()).stream()
+        return reviewRepository.getReviewsByCategoryOrderByCreationDateDesc(retrieveReviewDTO.getCategory()).stream()
                 .filter((Review r) -> {
                     if (retrieveReviewDTO.getCategory().equals(ReviewCategory.RECIPE.name())) {
                         return Objects.equals(r.getRecipeId().getId(), retrieveReviewDTO.getId());
@@ -50,6 +53,22 @@ public class ReviewService {
                     result.setPerson(modelMapper.map(r.getOwnerId(), PersonResponseDTO.class));
 
                     return result;
+                }).toList();
+    }
+
+    public List<ReviewResponseDTO> getAllForUser(String email) {
+        return reviewRepository.getReviewsByOwnerId_EmailAddress(email).stream()
+                .map((Review r) -> {
+                    ReviewResponseDTO returnReview = modelMapper.map(r, ReviewResponseDTO.class);
+
+                    if (r.getCategory().equals(ReviewCategory.RECIPE.name())) {
+                        returnReview.setEntityName(r.getRecipeId().getName());
+                    }
+                    else {
+                        returnReview.setEntityName(r.getRestaurantId().getName());
+                    }
+
+                    return returnReview;
                 }).toList();
     }
 
@@ -66,7 +85,21 @@ public class ReviewService {
 
         if (ratings.isEmpty()) return 0;
 
-        return ratings.stream().mapToInt(Integer::intValue).sum() / ratings.size();
+        return (int)Math.round((double)ratings.stream().mapToInt(Integer::intValue).sum() / ratings.size());
+    }
+
+    public List<PersonReviewResponseDTO> getReviewForOwner(Long id) {
+        return reviewRepository.getReviewsByOwnerId(id).stream()
+                .map(r -> modelMapper.map(r, PersonReviewResponseDTO.class))
+                .toList();
+    }
+
+    public Boolean checkEntityReviewExistence(String email, Long entityId, String category) {
+        return switch (category) {
+            case "RECIPE" -> reviewRepository.findByOwnerId_EmailAddressAndRecipeId_Id(email, entityId).isPresent();
+            case "RESTAURANT" -> reviewRepository.findByOwnerId_IdAndRestaurantId_Id(email, entityId).isPresent();
+            default -> false;
+        };
     }
 
     @Transactional
@@ -74,7 +107,11 @@ public class ReviewService {
 
         Review newReview = new Review();
 
-        Person owner = personService.getPersonById(createReviewDTO.getOwnerId());
+        if (checkEntityReviewExistence(createReviewDTO.getOwnerEmail(), createReviewDTO.getRecipeId(), "RECIPE")) {
+            throw new ReviewPostLimit();
+        }
+
+        Person owner = personService.getPersonByEmailAddressString(createReviewDTO.getOwnerEmail());
 
         if (ReviewCategory.RECIPE.name().equals(createReviewDTO.getCategory())) {
             Recipe recipe = recipeRestTemplateService.getRecipeById(createReviewDTO.getRecipeId());

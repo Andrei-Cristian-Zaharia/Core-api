@@ -15,7 +15,7 @@ public class CreateReviewDTO {
 
     private String category;
 
-    private Long ownerId;
+    private String ownerEmail;
 
     private Long recipeId;
 

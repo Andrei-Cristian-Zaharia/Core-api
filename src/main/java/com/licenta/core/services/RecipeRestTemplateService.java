@@ -11,6 +11,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class RecipeRestTemplateService {
@@ -26,12 +27,27 @@ public class RecipeRestTemplateService {
     public Recipe getRecipeById(Long id) {
         URI uri = ApiConfig.foodApiPath()
                 .path(RECIPE_ROUTE)
-                .path("id/{id}")
+                .path("findById")
+                .queryParam("id", id)
                 .build(id);
 
         HttpEntity<String> entityCredentials = new HttpEntity<>(null, createHeaderBody());
 
         return restTemplate.exchange(uri, HttpMethod.GET, entityCredentials, Recipe.class).getBody();
+    }
+
+    public List<Recipe> getRecipeByOwnerUsername(String username) {
+        URI uri = ApiConfig.foodApiPath()
+                .path(RECIPE_ROUTE)
+                .path("all/")
+                .path("owner/")
+                .path("username")
+                .queryParam("name", username)
+                .build(username);
+
+        HttpEntity<String> entityCredentials = new HttpEntity<>(null, createHeaderBody());
+
+        return List.of(Objects.requireNonNull(restTemplate.exchange(uri, HttpMethod.GET, entityCredentials, Recipe[].class).getBody()));
     }
 
     private static HttpHeaders createHeaderBody() {

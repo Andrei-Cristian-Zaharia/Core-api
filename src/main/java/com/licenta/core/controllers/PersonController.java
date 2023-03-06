@@ -2,6 +2,7 @@ package com.licenta.core.controllers;
 
 import com.licenta.core.models.*;
 import com.licenta.core.models.createRequestDTO.CreatePersonDTO;
+import com.licenta.core.models.responseDTO.PersonDetailsResponseDTO;
 import com.licenta.core.models.responseDTO.PersonResponseDTO;
 import com.licenta.core.services.PersonService;
 import org.springframework.http.HttpStatus;
@@ -40,13 +41,19 @@ public class PersonController {
         return ResponseEntity.ok().body(person);
     }
 
-    @GetMapping("/name/{name}")
-    public @ResponseBody ResponseEntity<Person> getPersonByName(@PathVariable String name) {
-        Person person = personService.getPersonByName(name);
+    @GetMapping("/name")
+    public @ResponseBody ResponseEntity<PersonResponseDTO> getPersonByName(@RequestParam String name) {
+        PersonResponseDTO person = personService.getPersonByName(name);
 
         return ResponseEntity.ok().body(person);
     }
 
+    @GetMapping("/details/name")
+    public @ResponseBody ResponseEntity<PersonDetailsResponseDTO> getPersonDetails(@RequestParam String name) {
+        PersonDetailsResponseDTO person = personService.getPersonDetails(name);
+
+        return ResponseEntity.ok().body(person);
+    }
 
     @PostMapping("/reset")
     public @ResponseBody ResponseEntity<String> changePassword(@RequestBody ChangePasswordDTO changePasswordDTO) {
