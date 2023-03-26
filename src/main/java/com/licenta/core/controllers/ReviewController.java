@@ -52,6 +52,6 @@ public class ReviewController {
     public @ResponseBody ResponseEntity<String> delete(@RequestHeader String email, @RequestParam Long id) {
         reviewService.deleteReview(email, id);
 
-        return ResponseEntity.ok().body("Review deleted !");
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Deleted");
     }
 }

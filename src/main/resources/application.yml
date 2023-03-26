@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/test
+    url: jdbc:postgresql://localhost:4000/test # 4000 for fedora, 5432 for windows
     driver-class-name: org.postgresql.Driver
     username: user
     password: pass
