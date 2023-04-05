@@ -1,10 +1,13 @@
 package com.licenta.core.services;
 
+import com.licenta.core.enums.ObjectType;
 import com.licenta.core.enums.ReviewCategory;
+import com.licenta.core.exceptionHandlers.NotFoundException;
 import com.licenta.core.exceptionHandlers.reviewExceptions.ReviewDeleteForbidden;
 import com.licenta.core.exceptionHandlers.reviewExceptions.ReviewPostLimit;
 import com.licenta.core.models.*;
 import com.licenta.core.models.createRequestDTO.CreateReviewDTO;
+import com.licenta.core.models.editDTO.EditReviewDTO;
 import com.licenta.core.models.responseDTO.PersonResponseDTO;
 import com.licenta.core.models.responseDTO.PersonReviewResponseDTO;
 import com.licenta.core.models.responseDTO.ReviewResponseDTO;
@@ -100,6 +103,21 @@ public class ReviewService {
             case "RESTAURANT" -> reviewRepository.findByOwnerId_IdAndRestaurantId_Id(email, entityId).isPresent();
             default -> false;
         };
+    }
+
+    @Transactional
+    public ReviewResponseDTO editReview(EditReviewDTO editReviewDTO) {
+        Optional<Review> review = reviewRepository.findById(editReviewDTO.getId());
+
+        if (review.isPresent()) {
+            review.get().setTitle(editReviewDTO.getTitle());
+            review.get().setRating(editReviewDTO.getRating());
+            review.get().setText(editReviewDTO.getText());
+
+            return modelMapper.map(reviewRepository.save(review.get()), ReviewResponseDTO.class);
+        } else {
+            throw new NotFoundException(ObjectType.REVIEW, editReviewDTO.getId());
+        }
     }
 
     @Transactional

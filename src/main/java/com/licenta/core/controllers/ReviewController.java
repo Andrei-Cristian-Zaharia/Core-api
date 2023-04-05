@@ -3,6 +3,7 @@ package com.licenta.core.controllers;
 import com.licenta.core.models.RetrieveReviewDTO;
 import com.licenta.core.models.Review;
 import com.licenta.core.models.createRequestDTO.CreateReviewDTO;
+import com.licenta.core.models.editDTO.EditReviewDTO;
 import com.licenta.core.models.responseDTO.ReviewResponseDTO;
 import com.licenta.core.services.ReviewService;
 import org.springframework.http.HttpStatus;
@@ -46,6 +47,11 @@ public class ReviewController {
     @PostMapping("/rating")
     public @ResponseBody ResponseEntity<Integer> getRatingForEntity(@RequestBody RetrieveReviewDTO retrieveReviewDTO){
         return ResponseEntity.ok().body(reviewService.getRatingForEntity(retrieveReviewDTO));
+    }
+
+    @PostMapping("/edit")
+    public @ResponseBody ResponseEntity<ReviewResponseDTO> editReview(@RequestBody EditReviewDTO editReviewDTO) {
+        return ResponseEntity.ok().body(reviewService.editReview(editReviewDTO));
     }
 
     @DeleteMapping("/delete")
