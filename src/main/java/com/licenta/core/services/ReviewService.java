@@ -105,6 +105,18 @@ public class ReviewService {
         };
     }
 
+    public Integer countUsersReview(String email) {
+        return reviewRepository.countByOwnerId_EmailAddress(email);
+    }
+
+    public Float averageRecipeRating(Long recipeId) {
+        return reviewRepository.getAverageRecipeRating(recipeId);
+    }
+
+    public Float averageRateForUser(String email) {
+        return reviewRepository.getRecipesAverageForUser(email);
+    }
+
     @Transactional
     public ReviewResponseDTO editReview(EditReviewDTO editReviewDTO) {
         Optional<Review> review = reviewRepository.findById(editReviewDTO.getId());

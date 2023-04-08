@@ -39,6 +39,23 @@ public class ReviewController {
         return ResponseEntity.ok().body(reviewService.checkEntityReviewExistence(email, entityId, category));
     }
 
+    @GetMapping("/countUserReviews")
+    public @ResponseBody ResponseEntity<Integer> getReviewsOfUser(@RequestParam String email) {
+        return ResponseEntity.ok(reviewService.countUsersReview(email));
+    }
+
+    @GetMapping("/averageRecipeRate")
+    public @ResponseBody ResponseEntity<Float> averageRecipeRate(@RequestParam Long recipeId) {
+
+        return ResponseEntity.ok(reviewService.averageRecipeRating(recipeId));
+    }
+
+    @GetMapping("/averageRateUser")
+    public @ResponseBody ResponseEntity<Float> averageRateUser(@RequestParam String email) {
+
+        return ResponseEntity.ok(reviewService.averageRateForUser(email));
+    }
+
     @PostMapping("/all/entity")
     public @ResponseBody ResponseEntity<List<ReviewResponseDTO>> getAllForEntity(@RequestBody RetrieveReviewDTO retrieveReviewDTO){
         return ResponseEntity.ok().body(reviewService.getAllReviewsForEntity(retrieveReviewDTO));
