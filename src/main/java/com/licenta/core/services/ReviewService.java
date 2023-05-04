@@ -100,7 +100,7 @@ public class ReviewService {
     public Boolean checkEntityReviewExistence(String email, Long entityId, String category) {
         return switch (category) {
             case "RECIPE" -> reviewRepository.findByOwnerId_EmailAddressAndRecipeId_Id(email, entityId).isPresent();
-            case "RESTAURANT" -> reviewRepository.findByOwnerId_IdAndRestaurantId_Id(email, entityId).isPresent();
+            case "RESTAURANT" -> reviewRepository.findByOwnerId_EmailAddressAndRestaurantId_Id(email, entityId).isPresent();
             default -> false;
         };
     }
@@ -137,7 +137,9 @@ public class ReviewService {
 
         Review newReview = new Review();
 
-        if (checkEntityReviewExistence(createReviewDTO.getOwnerEmail(), createReviewDTO.getRecipeId(), "RECIPE")) {
+        if (checkEntityReviewExistence(createReviewDTO.getOwnerEmail(),
+                createReviewDTO.getRecipeId(),
+                createReviewDTO.getCategory())) {
             throw new ReviewPostLimit();
         }
 
@@ -149,7 +151,7 @@ public class ReviewService {
             newReview.setCategory(ReviewCategory.RECIPE.name());
             newReview.setRecipeId(recipe);
         } else {
-            Restaurant restaurant = restaurantRestTemplateService.getRestaurantById(createReviewDTO.getRestaurantId());
+            Restaurant restaurant = restaurantRestTemplateService.getRestaurantById(createReviewDTO.getRecipeId());
 
             newReview.setCategory(ReviewCategory.RESTAURANT.name());
             newReview.setRestaurantId(restaurant);

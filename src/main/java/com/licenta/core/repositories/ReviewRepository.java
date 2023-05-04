@@ -32,5 +32,5 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     Float getRecipesAverageForUser(String email);
 
     Optional<Review> findByOwnerId_EmailAddressAndRecipeId_Id(String email, Long recipeId);
-    Optional<Review> findByOwnerId_IdAndRestaurantId_Id(String email, Long restaurantId);
+    Optional<Review> findByOwnerId_EmailAddressAndRestaurantId_Id(String email, Long restaurantId);
 }
