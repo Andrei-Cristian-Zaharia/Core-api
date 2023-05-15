@@ -8,6 +8,7 @@ import com.licenta.core.exceptionHandlers.authExceptios.FailedAuth;
 import com.licenta.core.exceptionHandlers.authExceptios.PersonAlreadyExists;
 import com.licenta.core.models.*;
 import com.licenta.core.models.createRequestDTO.CreatePersonDTO;
+import com.licenta.core.models.editDTO.EditPersonDTO;
 import com.licenta.core.models.responseDTO.*;
 import com.licenta.core.repositories.PersonRepository;
 import jakarta.transaction.Transactional;
@@ -15,6 +16,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -54,6 +56,20 @@ public class PersonService {
         );
 
         return modelMapper.map(personRepository.save(person), PersonResponseDTO.class);
+    }
+
+    @Transactional
+    public Person savePerson(EditPersonDTO dto) {
+        Person person = getPersonById(dto.getId());
+        changeAccountType(new ChangeAccountTypeDTO(person.getUsername(), dto.getAccountType()));
+        person.setUsername(dto.getUsername());
+        person.setEmailAddress(dto.getEmailAddress());
+
+        return personRepository.save(person);
+    }
+
+    public List<Person> getAllUsers() {
+        return personRepository.findAll();
     }
 
     public PersonResponseDTO getPersonByName(String name) {
@@ -130,6 +146,34 @@ public class PersonService {
             p.setHasRestaurant(req.getStatus());
             personRepository.save(p);
         });
+    }
+
+    public Person findByEmailAddress(String emailAddress) {
+        Optional<Person> person = personRepository.findByEmailAddress(emailAddress);
+
+        return person.orElseThrow(() -> {
+            throw new NotFoundException(ObjectType.PERSON, emailAddress);
+        });
+    }
+
+    public Person findByUsername(String username) {
+        Optional<Person> person = personRepository.findByUsername(username);
+
+        return person.orElseThrow(() -> {
+            throw new NotFoundException(ObjectType.PERSON, username);
+        });
+    }
+
+    public void changeAccountType(ChangeAccountTypeDTO dto) {
+        Person person = findByUsername(dto.getUsername());
+
+        switch (dto.getType()) {
+            case "REGULAR_USER" -> person.setAccountType(AccountType.REGULAR_USER.toString());
+            case "ADMIN" -> person.setAccountType(AccountType.ADMIN.toString());
+            default -> throw new NotFoundException("AccountType of type " + dto.getType() + " not found !");
+        }
+
+        personRepository.save(person);
     }
 
     public void deleteById(Long id) {

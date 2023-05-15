@@ -2,12 +2,15 @@ package com.licenta.core.controllers;
 
 import com.licenta.core.models.*;
 import com.licenta.core.models.createRequestDTO.CreatePersonDTO;
+import com.licenta.core.models.editDTO.EditPersonDTO;
 import com.licenta.core.models.responseDTO.PersonDetailsResponseDTO;
 import com.licenta.core.models.responseDTO.PersonResponseDTO;
 import com.licenta.core.services.PersonService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/person")
@@ -25,6 +28,11 @@ public class PersonController {
         PersonResponseDTO person = personService.createNewPerson(createPersonDTO);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(person);
+    }
+
+    @PostMapping("/save")
+    public @ResponseBody ResponseEntity<Person> savePerson(@RequestBody EditPersonDTO editPersonDTO) {
+        return ResponseEntity.ok().body(personService.savePerson(editPersonDTO));
     }
 
     @GetMapping("/email")
@@ -46,6 +54,11 @@ public class PersonController {
         PersonResponseDTO person = personService.getPersonByName(name);
 
         return ResponseEntity.ok().body(person);
+    }
+
+    @GetMapping("/all")
+    public @ResponseBody ResponseEntity<List<Person>>  getAllUsers() {
+        return ResponseEntity.ok().body(personService.getAllUsers());
     }
 
     @GetMapping("/details/name")
@@ -83,6 +96,11 @@ public class PersonController {
     @PostMapping("/updateRestaurantStatus")
     public void updatePersonHasRestaurantStatus(@RequestBody UpdatePersonHasRestaurantStatusDTO req) {
         personService.updateRestaurantStatus(req);
+    }
+
+    @PostMapping("/change/type")
+    public void changePersonAccountType(@RequestBody ChangeAccountTypeDTO changeAccountTypeDTO) {
+        personService.changeAccountType(changeAccountTypeDTO);
     }
 
     @DeleteMapping("/delete")

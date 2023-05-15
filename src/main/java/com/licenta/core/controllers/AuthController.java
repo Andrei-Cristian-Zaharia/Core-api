@@ -28,4 +28,9 @@ public class AuthController {
 
         return ResponseEntity.ok().body(result);
     }
+
+    @GetMapping("/adminCheck")
+    public @ResponseBody ResponseEntity<Boolean> checkAdmin(@RequestParam String emailAddress) {
+        return ResponseEntity.ok().body(authService.checkPersonAdmin(emailAddress));
+    }
 }

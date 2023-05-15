@@ -1,5 +1,8 @@
 package com.licenta.core.services;
 
+import com.licenta.core.enums.AccountType;
+import com.licenta.core.enums.ObjectType;
+import com.licenta.core.exceptionHandlers.NotFoundException;
 import com.licenta.core.exceptionHandlers.authExceptios.FailedAuth;
 import com.licenta.core.models.ChangePasswordDTO;
 import com.licenta.core.models.LoginDTO;
@@ -18,6 +21,7 @@ import org.springframework.stereotype.Service;
 import java.security.Key;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -74,5 +78,9 @@ public class AuthService {
         }
 
         return false;
+    }
+
+    public boolean checkPersonAdmin(String emailAddress) {
+        return personService.findByEmailAddress(emailAddress).getAccountType().equals(AccountType.ADMIN.toString());
     }
 }
