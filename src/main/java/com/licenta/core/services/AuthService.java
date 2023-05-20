@@ -1,18 +1,15 @@
 package com.licenta.core.services;
 
 import com.licenta.core.enums.AccountType;
-import com.licenta.core.enums.ObjectType;
-import com.licenta.core.exceptionHandlers.NotFoundException;
 import com.licenta.core.exceptionHandlers.authExceptios.FailedAuth;
-import com.licenta.core.models.ChangePasswordDTO;
 import com.licenta.core.models.LoginDTO;
 import com.licenta.core.models.Person;
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import com.licenta.core.models.responseDTO.PersonResponseDTO;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
@@ -21,7 +18,6 @@ import org.springframework.stereotype.Service;
 import java.security.Key;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -31,6 +27,7 @@ public class AuthService {
     private String secret;
 
     private final PersonService personService;
+    private final ModelMapper modelMapper;
 
     Key key;
 
@@ -39,8 +36,9 @@ public class AuthService {
         this.key = Keys.hmacShaKeyFor(secret.getBytes());
     }
 
-    public AuthService(PersonService personService) {
+    public AuthService(PersonService personService, ModelMapper modelMapper) {
         this.personService = personService;
+        this.modelMapper = modelMapper;
     }
 
     public String createToken(LoginDTO loginDTO) {
@@ -80,7 +78,19 @@ public class AuthService {
         return false;
     }
 
-    public boolean checkPersonAdmin(String emailAddress) {
-        return personService.findByEmailAddress(emailAddress).getAccountType().equals(AccountType.ADMIN.toString());
+    public boolean checkPersonAdmin(String token) {
+        Claims claims = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
+
+        return personService.findByEmailAddress(claims.get("email").toString())
+                .getAccountType().equals(AccountType.ADMIN.toString());
+    }
+
+    public PersonResponseDTO getUserByToken(String token) {
+        Claims claims = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
+
+        return modelMapper.map(
+                personService.findByEmailAddress(claims.get("email").toString()),
+                PersonResponseDTO.class
+        );
     }
 }

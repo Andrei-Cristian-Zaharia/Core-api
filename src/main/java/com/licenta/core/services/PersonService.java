@@ -44,6 +44,10 @@ public class PersonService {
             throw new PersonAlreadyExists();
         }
 
+        if (personRepository.findByUsername(createPersonDTO.getUsername()).isPresent()) {
+            throw new PersonAlreadyExists();
+        }
+
         Person person = new Person();
         person.setUsername(createPersonDTO.getUsername());
         person.setEmailAddress(createPersonDTO.getEmailAddress());

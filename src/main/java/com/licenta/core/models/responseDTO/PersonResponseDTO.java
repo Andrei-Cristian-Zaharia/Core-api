@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class PersonResponseDTO {
 
+    private Long id;
     private String username;
     private String emailAddress;
     private Boolean hasRestaurant;

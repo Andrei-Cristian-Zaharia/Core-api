@@ -1,6 +1,8 @@
 package com.licenta.core.controllers;
 
 import com.licenta.core.models.LoginDTO;
+import com.licenta.core.models.Person;
+import com.licenta.core.models.responseDTO.PersonResponseDTO;
 import com.licenta.core.services.AuthService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,7 +32,12 @@ public class AuthController {
     }
 
     @GetMapping("/adminCheck")
-    public @ResponseBody ResponseEntity<Boolean> checkAdmin(@RequestParam String emailAddress) {
-        return ResponseEntity.ok().body(authService.checkPersonAdmin(emailAddress));
+    public @ResponseBody ResponseEntity<Boolean> checkAdmin(@RequestParam String token) {
+        return ResponseEntity.ok().body(authService.checkPersonAdmin(token));
+    }
+
+    @GetMapping("/getUser")
+    public @ResponseBody ResponseEntity<PersonResponseDTO> getUser(@RequestParam String token) {
+        return ResponseEntity.ok().body(authService.getUserByToken(token));
     }
 }
