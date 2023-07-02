@@ -21,7 +21,9 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     Integer countByOwnerId_EmailAddress(String email);
 
-    @Query(value = "SELECT AVG(rating) as avgRate FROM reviews r WHERE r.id_recipe = ?1", nativeQuery = true)
+    @Query(value = "SELECT AVG(rating) as avgRate " +
+            "FROM reviews r " +
+            "WHERE r.id_recipe = ?1", nativeQuery = true)
     Float getAverageRecipeRating(Long id);
 
     @Query(value = "SELECT AVG(rating) as avgRate " +
